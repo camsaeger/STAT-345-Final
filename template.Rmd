@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Section One
 
-```{r student1 - Cam}
+```{r student1 - Cam }
 
 ```
 
