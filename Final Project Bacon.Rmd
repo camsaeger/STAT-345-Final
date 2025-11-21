@@ -12,6 +12,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r student1 - Cam, warning=FALSE}
 library(igraph)
+library(rvest)
+
+url <- "file:///C:/Users/camde/OneDrive/Fall%202025/STAT%20345/Projects/Movie,%20Release%20date%20between%202000-01-01%20and%202025-11-30,%20Action%20(Sorted%20by%20Popularity%20Ascending).html"
+h <- read_html(url)
 
 
 ```
