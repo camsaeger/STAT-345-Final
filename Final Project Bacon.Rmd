@@ -19,16 +19,14 @@ library(igraph)
 
 ## Section Two
 
-```{r student2 - Bryce}
+```{r - Bryce}
 
 
 
 ```
 
 ## Section Three
-
 ```{r student3 - Riley}
-
 
 
 ```
