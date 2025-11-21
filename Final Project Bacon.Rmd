@@ -23,6 +23,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Section Three
 
-```{r student3 - Riley}
-
+```{r student3 - Ri ley}
+  
 ```
