@@ -13,10 +13,24 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r student1 - Cam, warning=FALSE}
 library(igraph)
 library(rvest)
-
-url <- "file:///C:/Users/camde/OneDrive/Fall%202025/STAT%20345/Projects/Movie,%20Release%20date%20between%202000-01-01%20and%202025-11-30,%20Action%20(Sorted%20by%20Popularity%20Ascending).html"
+library(tidyverse)
+url <- "https://github.com/camsaeger/STAT-345-Final/blob/main/Movie%2C%20Release%20date%20between%202000-01-01%20and%202025-11-30%2C%20Action%20(Sorted%20by%20Popularity%20Ascending).html"
 h <- read_html(url)
+cast <- html_nodes(h, ".JdcqU+ .name-credits--title-text-big")
+length(cast)
+cast[1:2] 
+```
 
+```{r}
+library(TMDb)
+
+api_key <- "17dccb4de2aa1a7bf742763a8dc633be"
+
+
+actors <- movie_credits(, id = 550)
+head(actors)
+
+```
 
 ```
 
