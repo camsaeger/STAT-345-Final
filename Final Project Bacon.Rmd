@@ -10,21 +10,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Section One
 
-```{r student1 - Cam, warning=FALSE}
-library(igraph)
-library(rvest)
-library(tidyverse)
-```
+```{r - Cam}
+### Creating Movies Database
 
-```{r}
 library(TMDb)
 library(dplyr)
+library(tidyverse)
 api_key <- "17dccb4de2aa1a7bf742763a8dc633be"
 
 
 movies <- discover_movie(
   api_key     = api_key,
-  with_genres = 28,                 # 28 = Action
+  with_genres = 28,             
   primary_release_year = "2000"
 )
 
@@ -47,7 +44,7 @@ get_year_movies <- function(year_str) {
   total_pages <- min(first$total_pages, 500)
 
   map_df(1:total_pages, ~ {
-    Sys.sleep(0.25)
+    Sys.sleep(0.25) 
     discover_movie(
       api_key = api_key,
       with_genres = 28,
@@ -60,10 +57,69 @@ get_year_movies <- function(year_str) {
 movies_all <- map_df(years, get_year_movies)
 
 movies_df <- movies_all %>%
-  select(id, title, release_date)
+  select(id, title, release_date) 
 ```
 
+
+```{r - Cam}
+### 
+
+movies_df <- movies_all %>%
+  select(id, title, popularity, release_date) 
+
+movie_ids <- movies_df$id
+
+get_credits <- function(movie_id) {
+  # Pull credits
+  credits <- movie_credits(api_key, id = movie_id)
+
+  # ----- Directors -----
+  directors <- credits$crew %>%
+    filter(job == "Director") %>%
+    pull(name) %>%
+    paste(collapse = ", ")
+
+  # ----- All actors -----
+  actors <- credits$cast %>%
+    arrange(order) %>%
+    pull(name)
+
+  # ----- Top-billing actors (Top 5 by order) -----
+  top_actors <- credits$cast %>%
+    arrange(order) %>%
+    slice_head(n = 5) %>%
+    pull(name) %>%
+    paste(collapse = ", ")
+
+  tibble(
+    id = movie_id,
+    directors = directors,
+    top_actors = top_actors,
+    all_actors = list(actors)  # keep as list column for graph work
+  )
+}
+
+# Apply to all movies
+credits_df <- map_df(movie_ids, get_credits)
+
+# Merge with your movie dataframe
+movies_full <- movies_df %>%
+  left_join(credits_df, by = "id")
+
 ```
+
+### Actor Ideas:
+# Johnny Depp
+# Mark Whalberg
+# Kevin Hart
+# Dwayne Johnson
+# Leo DiCaprio
+# Jason Momoa
+# Chris Pratt
+# Chris Hemsworth
+# Paul Rudd
+# Chadwick Boseman
+# Arnold Schwarzenegger
 
 
 ## Section Two
