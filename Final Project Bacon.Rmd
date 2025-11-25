@@ -14,22 +14,53 @@ knitr::opts_chunk$set(echo = TRUE)
 library(igraph)
 library(rvest)
 library(tidyverse)
-url <- "https://github.com/camsaeger/STAT-345-Final/blob/main/Movie%2C%20Release%20date%20between%202000-01-01%20and%202025-11-30%2C%20Action%20(Sorted%20by%20Popularity%20Ascending).html"
-h <- read_html(url)
-cast <- html_nodes(h, ".JdcqU+ .name-credits--title-text-big")
-length(cast)
-cast[1:2] 
 ```
 
 ```{r}
 library(TMDb)
-
+library(dplyr)
 api_key <- "17dccb4de2aa1a7bf742763a8dc633be"
 
 
-actors <- movie_credits(, id = 550)
-head(actors)
+movies <- discover_movie(
+  api_key     = api_key,
+  with_genres = 28,                 # 28 = Action
+  primary_release_year = "2000"
+)
 
+movies_list <- movies$results
+
+movies_df <- movies_list %>%
+  select(id, title, release_date)
+
+years <- as.character(2000:2024)
+
+get_year_movies <- function(year_str) {
+
+  first <- discover_movie(
+    api_key = api_key,
+    with_genres = 28,
+    primary_release_year = year_str,
+    page = 1
+  )
+
+  total_pages <- min(first$total_pages, 500)
+
+  map_df(1:total_pages, ~ {
+    Sys.sleep(0.25)
+    discover_movie(
+      api_key = api_key,
+      with_genres = 28,
+      primary_release_year = year_str,
+      page = .x
+    )$results
+  })
+}
+
+movies_all <- map_df(years, get_year_movies)
+
+movies_df <- movies_all %>%
+  select(id, title, release_date)
 ```
 
 ```
