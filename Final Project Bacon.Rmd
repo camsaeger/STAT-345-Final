@@ -109,6 +109,7 @@ movies_full <- movies_df %>%
 ```
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 ### Actor Ideas:
 # Johnny Depp
 # Mark Whalberg
@@ -121,6 +122,8 @@ movies_full <- movies_df %>%
 # Paul Rudd
 # Chadwick Boseman
 # Arnold Schwarzenegger
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 
