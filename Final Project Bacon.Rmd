@@ -66,7 +66,9 @@ movies_df <- movies_all %>%
 
 
 ## Section Two
+```{r}
 
+<<<<<<< Updated upstream
 ```{r}
 library(TMDb)
 library(dplyr)
@@ -78,6 +80,20 @@ movies <- discover_movie(
   with_genres = 28,                 # 28 = Action
   primary_release_year = "2000"
 )
+=======
+library(TMDb)
+
+
+searchOBAA <- search_movie(api_key = api_key, query = "One Battle After Another")
+movie_idOBAA <- searchOBAA$results$id
+
+# Get credits (cast + crew)
+creditsOBAA <- movie_credits(api_key = api_key, id = movie_idOBAA)
+
+# Inspect cast
+castOBAA <- creditsOBAA$cast
+castOBAA[, c("name", "character")]
+>>>>>>> Stashed changes
 
 movies_list <- movies$results
 
@@ -113,6 +129,7 @@ movies_all <- map_df(years, get_year_movies)
 movies_df <- movies_all %>%
   select(id, title, release_date)
 ```
+
 
 ## Section Three
 ```{r student3 - Riley}
