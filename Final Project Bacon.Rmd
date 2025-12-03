@@ -108,6 +108,7 @@ movies_full <- movies_df %>%
 
 ```
 
+<<<<<<< Updated upstream
 ### Actor Ideas:
 # Johnny Depp
 # Mark Whalberg
@@ -120,15 +121,28 @@ movies_full <- movies_df %>%
 # Paul Rudd
 # Chadwick Boseman
 # Arnold Schwarzenegger
+=======
+>>>>>>> Stashed changes
 
 
 ## Section Two
+```{r}
 
-```{r - Bryce}
+library(TMDb)
 
 
+searchOBAA <- search_movie(api_key = api_key, query = "One Battle After Another")
+movie_idOBAA <- searchOBAA$results$id
+
+# Get credits (cast + crew)
+creditsOBAA <- movie_credits(api_key = api_key, id = movie_idOBAA)
+
+# Inspect cast
+castOBAA <- creditsOBAA$cast
+castOBAA[, c("name", "character")]
 
 ```
+
 
 ## Section Three
 ```{r student3 - Riley}
