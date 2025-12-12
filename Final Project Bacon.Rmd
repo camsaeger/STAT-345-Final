@@ -150,7 +150,7 @@ movies <- movies %>%
 
 
 actor_movies <- actor %>%
-  left_join(movies1, by = "id", relationship = "many-to-many")
+  left_join(movies, by = "id", relationship = "many-to-many")
 
 
 ```
