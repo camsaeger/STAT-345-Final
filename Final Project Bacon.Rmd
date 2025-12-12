@@ -132,14 +132,28 @@ movies
 
 
 ```{r}
+write.csv(actor_movie_edges, "actor1", row.names = FALSE)
 
-actor <- read.csv("actor") %>%
+actor <- read.csv("actor1") %>%
   rename(id = movie_id)
 
 actor
 
 ```
 
+```{r}
+
+library(dplyr)
+
+movies <- movies %>%
+  distinct(id, .keep_all = TRUE)
+
+
+actor_movies <- actor %>%
+  left_join(movies1, by = "id", relationship = "many-to-many")
+
+
+```
 
 ## Section Three
 ```{r student3 - Riley}
