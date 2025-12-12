@@ -117,16 +117,17 @@ actor_movie_edges <- map2_df(
 )
 
 
-
-
 ```
-
-
 
 ## Section Two
 ```{r}
+write.csv(movies_df1, "movie", row.names = FALSE)
 
-  
+read.csv("movie")
+
+write.csv(actor_movie_edges, "actor", row.names=FALSE)
+
+read.csv("actor")
 ```
 
 
