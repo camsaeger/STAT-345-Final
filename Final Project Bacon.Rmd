@@ -125,51 +125,7 @@ actor_movie_edges <- map2_df(
 
 ## Section Two
 ```{r}
-library(dplyr)
-library(purrr)
-library(tidyr)
-library(tibble)
 
-credits_list <- map(movies_df$id, safe_credits)
-
-# credits_list from your earlier code (safe_credits applied)
-# movies_df has id, title, etc.
-
-# Extract full cast list (not just top actor)
-all_cast <- map2_df(
-  credits_list,
-  movies_df$id,
-  ~ {
-    if (is.null(.x) || is.null(.x$cast)) {
-      return(tibble(movie_id = .y, actor = NA_character_))
-    }
-    tibble(
-      movie_id = .y,
-      actor = map_chr(.x$cast, ~ pluck(.x, "name", .default = NA_character_))
-    )
-  }
-)
-
-library(igraph)
-
-# Remove movies with missing cast
-clean_cast <- all_cast %>% filter(!is.na(actor))
-
-# Create actor pairs per movie
-actor_pairs <- clean_cast %>%
-  group_by(movie_id) %>%
-  summarize(pairs = combn(actor, 2, simplify = FALSE), .groups = "drop") %>%
-  unnest(cols = pairs) %>%
-  mutate(
-    actor1 = map_chr(pairs, 1),
-    actor2 = map_chr(pairs, 2)
-  ) %>%
-  select(actor1, actor2)
-
-g <- graph_from_data_frame(actor_pairs, directed = FALSE)
-
-wahlberg_numbers <- distances(g, v = "Mark Wahlberg")
-sort(wahlberg_numbers)
   
 ```
 
