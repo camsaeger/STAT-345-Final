@@ -155,32 +155,28 @@ actor_movies <- actor %>%
 
 ```
 
-## Section Three
-```{r student3 - Riley}
 
-
-```
 
 ```{r}
-library(igraph)
 
 actor_graph <- graph_from_data_frame(actor_movies[, c("actor_name", "id")], directed = FALSE)
+#This is creating the graph from the dataframe.
 
 ```
 
 ```{r}
 connect_to_mark <- function(actor) {
-  p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]
-  if (length(p) == 0) return("No connection found.")
+  p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]               #This is finding the shortest path from an input actor and connecting it back to Mark Wahlberg
+  if (length(p) == 0) return("No connection found.")    #This is saying if there is no path to Mark Wahlberg then it will give an output saying "No connection found."
 
   nodes <- names(p)
-
+#This replaces the movie id with the movie names
   path <- sapply(nodes, function(x)
     if (x %in% actor_movies$id) actor_movies$title[actor_movies$id == x][1] else x
   )
-
+#This adds how many movies it took to connect back to Mark Wahlberg
   movie_count <- sum(path %in% actor_movies$title)
-
+#This prints the path including actors and how many movies it took
   list(
     path = unname(path),
     movies = movie_count
@@ -204,4 +200,3 @@ connect_to_mark("Jennifer Aniston")
 ```{r}
 connect_to_mark("Kevin Bacon")
 ```
-
