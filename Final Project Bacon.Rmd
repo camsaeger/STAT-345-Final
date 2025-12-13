@@ -160,3 +160,48 @@ actor_movies <- actor %>%
 
 
 ```
+
+```{r}
+library(igraph)
+
+actor_graph <- graph_from_data_frame(actor_movies[, c("actor_name", "id")], directed = FALSE)
+
+```
+
+```{r}
+connect_to_mark <- function(actor) {
+  p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]
+  if (length(p) == 0) return("No connection found.")
+
+  nodes <- names(p)
+
+  path <- sapply(nodes, function(x)
+    if (x %in% actor_movies$id) actor_movies$title[actor_movies$id == x][1] else x
+  )
+
+  movie_count <- sum(path %in% actor_movies$title)
+
+  list(
+    path = unname(path),
+    movies = movie_count
+  )
+}
+
+
+```
+
+```{r}
+connect_to_mark("Jason Momoa")
+```
+```{r}
+connect_to_mark("Kevin Hart")
+```
+
+```{r}
+connect_to_mark("Jennifer Aniston")
+```
+
+```{r}
+connect_to_mark("Kevin Bacon")
+```
+
