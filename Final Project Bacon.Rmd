@@ -23,7 +23,7 @@ library(tidyverse)
 
 library(TMDb)
 library(dplyr)
-library(tidyverse)
+
 api_key <- "17dccb4de2aa1a7bf742763a8dc633be"
 
 
@@ -73,7 +73,7 @@ movies_df <- movies_all %>%
 
 ###                 
 
-movies_df1 <- movies_all %>%
+movies_df1 <- movies_all %>% 
   select(id, title, popularity, release_date)
 
 movies_df1 <- movies_df1 %>%
@@ -81,15 +81,13 @@ movies_df1 <- movies_df1 %>%
     release_date >= as.Date("2010-01-01"),
     release_date <= as.Date("2020-12-31")
     )
+# Here we took movies_all and only selected movie id, movie title, movie popularity, and movie release date. We then filtered it to only include movies that were released from 2010 to 2020. We chose this because of the amount of the data that was pulled in from this package. With this time frame we had 11,370 movies to work with. 
   
-  
-movie_ids <- movies_df1$id
 ```
 
 
 ```{r}
 library(purrr)
-library(dplyr)
 library(tibble)
 library(tidyr)
 
@@ -121,11 +119,10 @@ actor_movie_edges <- map2_df(
 
 ## Section Two
 ```{r}
-library(dplyr)
 
-write.csv(movies_df1, "movie", row.names = FALSE)
+write.csv(movies_df1, "movie", row.names = FALSE) # This is writing the data frame that was pulled from the package to a csv for easy access for everyone in the group.
 
-movies <- read.csv("movie")
+movies <- read.csv("movie")  
 
 movies
 ```
@@ -134,7 +131,7 @@ movies
 ```{r}
 write.csv(actor_movie_edges, "actor1", row.names = FALSE)
 
-actor <- read.csv("actor1") %>%
+actor <- read.csv("actor1") %>% # Here we renamed the column to match with the data frame movies to allow for a join based on id.
   rename(id = movie_id)
 
 actor
@@ -143,13 +140,11 @@ actor
 
 ```{r}
 
-library(dplyr)
-
-movies <- movies %>%
+movies <- movies %>% # This ensures that there are no duplicates and keeps only one row per movie. 
   distinct(id, .keep_all = TRUE)
 
 
-actor_movies <- actor %>%
+actor_movies <- actor %>% # Here we did a left join to join the movies data set onto the actor data set based on the movie id. R prompted us to set the relationship to "many-to-many". 
   left_join(movies, by = "id", relationship = "many-to-many")
 
 
