@@ -91,23 +91,21 @@ library(purrr)
 library(tibble)
 library(tidyr)
 
-safe_credits <- purrr::possibly(
-  ~ movie_credits(api_key, .x),
-  otherwise = NULL
-)
+safe_credits <- function(x) movie_credits(api_key, x)   #This is just using the api key we got.
 
-credits_list <- map(movies_df1$id, safe_credits)
+credits_list <- map(movies_df1$id, safe_credits)      #This is the list of the movie credits
 
+#This is making the edges of the actor and movie dataframe
 actor_movie_edges <- map2_df(
   movies_df1$id,
   credits_list,
   ~ {
     if (is.null(.y)) return(NULL)
-
+#This is making the cast list a tibble
     cast_df <- tibble::as_tibble(.y$cast)
 
     if (!"name" %in% names(cast_df)) return(NULL)
-
+#This makes the dataframe with the actor id, actor name, and movie id 
     cast_df %>%
       select(actor_id = id, actor_name = name) %>%
       mutate(movie_id = .x)
@@ -182,16 +180,9 @@ connect_to_mark <- function(actor) {
 ```
 
 ```{r}
+#This is testing the function
 connect_to_mark("Jason Momoa")
-```
-```{r}
 connect_to_mark("Kevin Hart")
-```
-
-```{r}
 connect_to_mark("Jennifer Aniston")
-```
-
-```{r}
 connect_to_mark("Kevin Bacon")
 ```
