@@ -82,6 +82,9 @@ movies_df1 <- movies_df1 %>%
 
 
 ```{r}
+
+### Creating Data Set of Edges Of Movies
+
 library(purrr)
 library(tibble)
 library(tidyr)
@@ -154,12 +157,17 @@ actor_movies <- actor %>% # Here we did a left join to join the movies data set 
 
 ```{r}
 
+### Creating Actor Graph
+
 actor_graph <- graph_from_data_frame(actor_movies[, c("actor_name", "id")], directed = FALSE)
 #This is creating the graph from the dataframe.
 
 ```
 
 ```{r}
+
+### Creating Connection To Mark Function
+
 connect_to_mark <- function(actor) {
   p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]               #This is finding the shortest path from an input actor and connecting it back to Mark Wahlberg
   if (length(p) == 0) return("No connection found.")    #This is saying if there is no path to Mark Wahlberg then it will give an output saying "No connection found."
@@ -182,6 +190,9 @@ connect_to_mark <- function(actor) {
 ```
 
 ```{r}
+
+### Testing Our Function
+
 #This is testing the function
 connect_to_mark("Jason Momoa")
 connect_to_mark("Kevin Hart")
