@@ -9,6 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+# Descriptive Statistics On Wahlberg Connections
+
+
 ```{r graph, echo=FALSE, message=FALSE, warning=FALSE, results = 'hide'}
 library(igraph)
 library(rvest)
@@ -75,7 +79,13 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
     x = "Wahlberg Number (distance from Mark Wahlberg)",
     y = "Number of actors"
   ) + theme_minimal()
+```
 
+
+# Undirected Subset Connectedness Graph
+
+
+```{r graph 2,echo=FALSE, message=FALSE, warning=FALSE, results = 'hide'}
 actor_edges <- actor_movies %>%
   select(id, actor_name) %>%
   distinct() %>%
@@ -171,7 +181,9 @@ popular_graph <- make_restricted_graph(actor_graph, allowed_movies)
 
 ```
 
-```{r - Bryce}
+### This tests our functions
+
+```{r function, echo=FALSE, message=FALSE, warning=FALSE}
 ### Testing Our Function
 
 #This is testing the function
