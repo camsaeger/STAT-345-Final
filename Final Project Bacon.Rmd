@@ -207,23 +207,27 @@ connect_to_mark("Kevin Bacon")
 
 library(ggplot2)
 
+#This is collecting the shortest paths to Mark Wahlberg
 wahlberg_distances <- distances(
   actor_graph,
   v = V(actor_graph),
   to = "Mark Wahlberg"
 )
 
+#This converts the previous distances into a data frame
 wahlberg_df <- data.frame(
   actor = rownames(wahlberg_distances),
   wahlberg_number = as.numeric(wahlberg_distances[,1])
 )
 
+#This removes the actors who are not connected to Mark Wahlberg.
 wahlberg_df_connected <- wahlberg_df %>%
   filter(is.finite(wahlberg_number))
 
-
+#This generates the summary statistics.
 summary(wahlberg_df_connected$wahlberg_number)
 
+#This shows the distribution in a bar graph.
 ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
   geom_bar(fill = "blue") +
   labs(
