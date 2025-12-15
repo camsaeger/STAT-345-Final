@@ -280,8 +280,124 @@ plot(
 ```
 
 ```{r}
+# This function finds the shortest actor–movie–actor path
+# from a given actor to Mark Wahlberg using a specified graph.
+# It returns both the path and the number of movies involved.
 
+connect_to_mark_2 <- function(actor, graph, actor_movies) {
 
+  # Compute the shortest path between the actor and Mark Wahlberg
+  p <- shortest_paths(
+    graph,
+    from = actor,
+    to   = "Mark Wahlberg"
+  )$vpath[[1]]
 
+  # If no path exists, return a message instead of failing
+  if (length(p) == 0) {
+    return(list(path = "No connection found.", movies = NA))
+  }
+
+  # Extract the node names along the path
+  nodes <- names(p)
+
+  # Replace movie IDs with movie titles for readability
+  path <- sapply(nodes, function(x) {
+    if (x %in% actor_movies$id) {
+      actor_movies$title[actor_movies$id == x][1]
+    } else {
+      x
+    }
+  })
+
+  # Count how many movie nodes appear in the path
+  movie_count <- sum(path %in% actor_movies$title)
+
+  # Return the readable path and movie count
+  list(
+    path   = unname(path),
+    movies = movie_count
+  )
+}
 ```
+
+```{r}
+library(igraph)
+
+# This function creates a restricted version of the full actor graph.
+# It removes all movie nodes that do NOT meet a given condition
+# (e.g., only popular movies), while keeping all actor nodes.
+
+make_restricted_graph <- function(full_graph, allowed_movie_ids) {
+
+  # Keep all actor nodes (nodes that are not movie IDs)
+  # and only the movie nodes that meet the restriction
+  keep_names <- c(
+    V(full_graph)$name[!(V(full_graph)$name %in% actor_movies$id)],
+    allowed_movie_ids
+  )
+
+  # Induce a subgraph containing only the kept nodes
+  induced_subgraph(
+    full_graph,
+    vids = V(full_graph)[name %in% keep_names]
+  )
+}
+```
+
+```{r}
+# Define a cutoff for "popular" movies
+# Here, we keep only movies in the top 10% of popularity
+cutoff <- quantile(actor_movies$popularity, 0.90, na.rm = TRUE)
+
+# Identify movie IDs that meet the popularity requirement
+allowed_movies <- actor_movies$id[actor_movies$popularity >= cutoff]
+
+# Create a new graph that only includes popular movies
+popular_graph <- make_restricted_graph(actor_graph, allowed_movies)
+```
+
+
+```{r}
+# This function summarizes key structural properties of a graph.
+# These metrics help compare the full graph to the restricted graph.
+
+graph_summary <- function(g) {
+
+  # Identify connected components in the graph
+  comps <- components(g)
+
+  # Return important network statistics
+  data.frame(
+    vertices          = vcount(g),            # total nodes
+    edges             = ecount(g),             # total connections
+    components        = comps$no,               # number of disconnected groups
+    largest_component = max(comps$csize),      # size of biggest group
+    density           = edge_density(g, loops = FALSE)
+  )
+}
+```
+
+```{r}
+# Summary statistics for the full actor network
+graph_summary(actor_graph)
+
+# Summary statistics for the popular-movies-only network
+graph_summary(popular_graph)
+```
+
+```{r}
+# Full network connections
+connect_to_mark_2("Jason Momoa", actor_graph, actor_movies)
+connect_to_mark_2("Kevin Hart", actor_graph, actor_movies)
+connect_to_mark_2("Jennifer Aniston", actor_graph, actor_movies)
+
+# Popular-movies-only connections
+connect_to_mark_2("Jason Momoa", popular_graph, actor_movies)
+connect_to_mark_2("Kevin Hart", popular_graph, actor_movies)
+connect_to_mark_2("Jennifer Aniston", popular_graph, actor_movies)
+```
+
+
+
 
