@@ -20,4 +20,4 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```
-
+We had to work on putting together the connection_to_mark function. Overall, there were a couple different things we had to work around. One specific thing we had to work around was replacing the movie id with movie titles. This was fixed by putting nodes <- names(p) in the code chunk with the function so it output the movies in the path it took. Also, creating the path and the sum of the path was difficult. We worked around the addition of the paths part by asking ChatGPT how to add the paths up to output the Bacon/Wahlberg number.
