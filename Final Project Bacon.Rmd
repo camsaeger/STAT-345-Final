@@ -249,6 +249,39 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
 
 ```{r - Bryce}
 
+actor_edges <- actor_movies %>%
+  select(id, actor_name) %>%
+  distinct() %>%
+  inner_join(., ., by = "id") %>%
+  filter(actor_name.x != actor_name.y) %>%
+  select(from = actor_name.x, to = actor_name.y)
+actor_graph_all <- graph_from_data_frame(actor_edges, directed = FALSE)
+selected_actors <- c(
+  "Mark Wahlberg",
+  "Mila Kunis",
+  "Michael B. Jordan",
+  "Jason Momoa",
+  "Scarlett Johansson",
+  "Chris Evans",
+  "Leonardo DiCaprio",
+  "Kevin Hart",
+  "Dwayne Johnson",
+  "Kevin Bacon"
+)
+
+g10 <- induced_subgraph(
+  actor_graph_all,
+  V(actor_graph_all)$name %in% selected_actors
+)
+
+plot(
+  g10,
+  layout = layout_with_fr(g10) * 3,
+  vertex.size = 25,
+  vertex.label.cex = 0.8,
+  edge.width = 3
+)
+
 
 
 ```
