@@ -234,14 +234,7 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
     title = "Distribution of Wahlberg Numbers",
     x = "Wahlberg Number (distance from Mark Wahlberg)",
     y = "Number of actors"
-  ) +
-  theme_minimal()
-
-
-```
-
-```{r}
-
+  ) + theme_minimal()
 
 
 ```
