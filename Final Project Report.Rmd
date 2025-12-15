@@ -203,3 +203,16 @@ connect_to_mark_2("Kevin Hart", popular_graph, actor_movies)
 connect_to_mark_2("Jennifer Aniston", popular_graph, actor_movies)
 ```
 We had to work on putting together the connection_to_mark function. Overall, there were a couple different things we had to work around. One specific thing we had to work around was replacing the movie id with movie titles. This was fixed by putting nodes <- names(p) in the code chunk with the function so it output the movies in the path it took. Also, creating the path and the sum of the path was difficult. We worked around the addition of the paths part by asking ChatGPT how to add the paths up to output the Bacon/Wahlberg number.
+
+```{r}
+
+```
+In this project, my part was to restrict the actor–movie network to see how it affects the connectedness graph and the game. Instead of allowing all movies, I limited the network so that only highly popular movies could be used. The goal was to see how this restriction changed the structure of the network and the results of the game.
+
+The original network was built as a graph with actors and movies as nodes and edges representing actor–movie relationships. To create a restricted version, I defined popular movies as those in the top 10% of popularity scores in the dataset. All other movie nodes were removed, while actor nodes were retained.
+
+The unrestricted graph was largely connected, with most nodes belonging to one large component. After restricting the network to popular movies, the graph became more separated, with many more connected components and a much smaller largest component. This shows that popular movies alone are not sufficient to maintain connectivity across the full actor network.
+
+I modified the previous connect_to_mark function into connect_to_mark_2 to find the shortest path from a chosen actor to Mark Wahlberg using only popular movies. Under the popularity restriction, many actors had no valid connection, and those that did often required longer paths through blockbuster films.
+
+Restricting the network to popular movies significantly reduced connectedness and increased path lengths. This shows that less popular films play an important role in linking actors across the broader network, while popular movies mainly connect a smaller, mainstream core of actors.
