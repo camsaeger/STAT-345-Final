@@ -235,9 +235,20 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
 
 
 ```
+```{r}
+
+
+
+```
 
 
 ```{r - Bryce}
+
+
+
+```
+
+```{r}
 
 
 
