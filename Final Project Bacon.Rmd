@@ -203,6 +203,8 @@ connect_to_mark("Kevin Bacon")
 
 ```{r - Cam, warning=FALSE}
 
+### Descriptive Statistics
+
 library(ggplot2)
 
 wahlberg_distances <- distances(
