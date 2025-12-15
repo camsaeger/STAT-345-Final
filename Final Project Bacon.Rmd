@@ -1,7 +1,7 @@
 ---
-title: "Super Awesome Project Template"
+title: "Mark Wahlberg Number"
 output: word_document
-date: "2023-03-31"
+date: "2025-12-16"
 ---
 
 ```{r setup, include=FALSE}
@@ -26,19 +26,23 @@ library(dplyr)
 
 api_key <- "17dccb4de2aa1a7bf742763a8dc633be" # This is our API key that allows us to use the package that we installed to gather data from. 
 
-
+#This grabs all the action movies since 2000
 movies <- discover_movie(
   api_key     = api_key,
   with_genres = 28,             
   primary_release_year = "2000"
 )
 
+#This stores the result
 movies_list <- movies$results
 
+#This creates a character vector.
 years <- as.character(2000:2024)
 
+#This is a function to download all action movies from a given year
 get_year_movies <- function(year_str) {
 
+  #This gets the first page of results for this year.
   first <- discover_movie(
     api_key = api_key,
     with_genres = 28,
@@ -46,8 +50,10 @@ get_year_movies <- function(year_str) {
     page = 1
   )
 
+  #This is how many pages we are requesting.
   total_pages <- min(first$total_pages, 500)
 
+  #This is looking through all the pages and making them into a data frame.
   map_df(1:total_pages, ~ {
     Sys.sleep(0.25) 
     discover_movie(
@@ -59,6 +65,7 @@ get_year_movies <- function(year_str) {
   })
 }
 
+#This combines all the action movies into one data frame.
 movies_all <- map_df(years, get_year_movies)
 
 ```
