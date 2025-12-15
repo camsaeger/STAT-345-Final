@@ -207,23 +207,27 @@ connect_to_mark("Kevin Bacon")
 
 library(ggplot2)
 
+#This is collecting the shortest paths to Mark Wahlberg
 wahlberg_distances <- distances(
   actor_graph,
   v = V(actor_graph),
   to = "Mark Wahlberg"
 )
 
+#This converts the previous distances into a data frame
 wahlberg_df <- data.frame(
   actor = rownames(wahlberg_distances),
   wahlberg_number = as.numeric(wahlberg_distances[,1])
 )
 
+#This removes the actors who are not connected to Mark Wahlberg.
 wahlberg_df_connected <- wahlberg_df %>%
   filter(is.finite(wahlberg_number))
 
-
+#This generates the summary statistics.
 summary(wahlberg_df_connected$wahlberg_number)
 
+#This shows the distribution in a bar graph.
 ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
   geom_bar(fill = "blue") +
   labs(
@@ -235,6 +239,7 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
 
 
 ```
+
 ```{r}
 
 
@@ -243,6 +248,39 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
 
 
 ```{r - Bryce}
+
+actor_edges <- actor_movies %>%
+  select(id, actor_name) %>%
+  distinct() %>%
+  inner_join(., ., by = "id") %>%
+  filter(actor_name.x != actor_name.y) %>%
+  select(from = actor_name.x, to = actor_name.y)
+actor_graph_all <- graph_from_data_frame(actor_edges, directed = FALSE)
+selected_actors <- c(
+  "Mark Wahlberg",
+  "Mila Kunis",
+  "Michael B. Jordan",
+  "Jason Momoa",
+  "Scarlett Johansson",
+  "Chris Evans",
+  "Leonardo DiCaprio",
+  "Kevin Hart",
+  "Dwayne Johnson",
+  "Kevin Bacon"
+)
+
+g10 <- induced_subgraph(
+  actor_graph_all,
+  V(actor_graph_all)$name %in% selected_actors
+)
+
+plot(
+  g10,
+  layout = layout_with_fr(g10) * 3,
+  vertex.size = 25,
+  vertex.label.cex = 0.8,
+  edge.width = 3
+)
 
 
 
