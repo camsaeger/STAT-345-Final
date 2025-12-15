@@ -1,6 +1,6 @@
 ---
 title: "Final Project Report"
-author: "Cam Saeger"
+author: "Cam Saeger, Bryce Barnett, Riley Bechel"
 date: "2025-12-14"
 output: html_document
 ---
@@ -9,15 +9,185 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r - Cam}
+```{r graph, echo=FALSE, message=FALSE, warning=FALSE, results = 'hide'}
+library(igraph)
+library(rvest)
+library(tidyverse)
+library(TMDb)
+library(dplyr)
+library(purrr)
+library(tibble)
+library(tidyr)
+library(ggplot2)
 
 
+movies <- read.csv("movie")  
+actor <- read.csv("actor1") %>%
+  rename(id = movie_id)
+movies <- movies %>%  
+  distinct(id, .keep_all = TRUE)
+actor_movies <- actor %>% 
+  left_join(movies, by = "id", relationship = "many-to-many")
+actor_graph <- graph_from_data_frame(actor_movies[, c("actor_name", "id")], directed = FALSE)
+
+connect_to_mark <- function(actor) {
+  p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]               #This is finding the shortest path from an input actor and connecting it back to Mark Wahlberg
+  if (length(p) == 0) return("No connection found.")    #This is saying if there is no path to Mark Wahlberg then it will give an output saying "No connection found."
+
+  nodes <- names(p)
+#This replaces the movie id with the movie names
+  path <- sapply(nodes, function(x)
+    if (x %in% actor_movies$id) actor_movies$title[actor_movies$id == x][1] else x
+  )
+#This adds how many movies it took to connect back to Mark Wahlberg
+  movie_count <- sum(path %in% actor_movies$title)
+#This prints the path including actors and how many movies it took
+  list(
+    path = unname(path),
+    movies = movie_count
+  )
+}
+
+wahlberg_distances <- distances(
+  actor_graph,
+  v = V(actor_graph),
+  to = "Mark Wahlberg"
+)
+
+#This converts the previous distances into a data frame
+wahlberg_df <- data.frame(
+  actor = rownames(wahlberg_distances),
+  wahlberg_number = as.numeric(wahlberg_distances[,1])
+)
+
+#This removes the actors who are not connected to Mark Wahlberg.
+wahlberg_df_connected <- wahlberg_df %>%
+  filter(is.finite(wahlberg_number))
+
+#This generates the summary statistics.
+summary(wahlberg_df_connected$wahlberg_number)
+
+#This shows the distribution in a bar graph.
+ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
+  geom_bar(fill = "blue") +
+  labs(
+    title = "Distribution of Wahlberg Numbers",
+    x = "Wahlberg Number (distance from Mark Wahlberg)",
+    y = "Number of actors"
+  ) + theme_minimal()
+
+actor_edges <- actor_movies %>%
+  select(id, actor_name) %>%
+  distinct() %>%
+  inner_join(., ., by = "id") %>%
+  filter(actor_name.x != actor_name.y) %>%
+  select(from = actor_name.x, to = actor_name.y)
+actor_graph_all <- graph_from_data_frame(actor_edges, directed = FALSE)
+selected_actors <- c(
+  "Mark Wahlberg",
+  "Mila Kunis",
+  "Michael B. Jordan",
+  "Jason Momoa",
+  "Scarlett Johansson",
+  "Chris Evans",
+  "Leonardo DiCaprio",
+  "Kevin Hart",
+  "Dwayne Johnson",
+  "Kevin Bacon"
+)
+
+g10 <- induced_subgraph(
+  actor_graph_all,
+  V(actor_graph_all)$name %in% selected_actors
+)
+
+plot(
+  g10,
+  layout = layout_with_fr(g10) * 3,
+  vertex.size = 25,
+  vertex.label.cex = 0.8,
+  edge.width = 3
+)
+
+connect_to_mark_2 <- function(actor, graph, actor_movies) {
+
+  # Compute the shortest path between the actor and Mark Wahlberg
+  p <- shortest_paths(
+    graph,
+    from = actor,
+    to   = "Mark Wahlberg"
+  )$vpath[[1]]
+
+  # If no path exists, return a message instead of failing
+  if (length(p) == 0) {
+    return(list(path = "No connection found.", movies = NA))
+  }
+
+  # Extract the node names along the path
+  nodes <- names(p)
+
+  # Replace movie IDs with movie titles for readability
+  path <- sapply(nodes, function(x) {
+    if (x %in% actor_movies$id) {
+      actor_movies$title[actor_movies$id == x][1]
+    } else {
+      x
+    }
+  })
+
+  # Count how many movie nodes appear in the path
+  movie_count <- sum(path %in% actor_movies$title)
+
+  # Return the readable path and movie count
+  list(
+    path   = unname(path),
+    movies = movie_count
+  )
+}
+
+make_restricted_graph <- function(full_graph, allowed_movie_ids) {
+
+  # Keep all actor nodes (nodes that are not movie IDs)
+  # and only the movie nodes that meet the restriction
+  keep_names <- c(
+    V(full_graph)$name[!(V(full_graph)$name %in% actor_movies$id)],
+    allowed_movie_ids
+  )
+
+  # Induce a subgraph containing only the kept nodes
+  induced_subgraph(
+    full_graph,
+    vids = V(full_graph)[name %in% keep_names]
+  )
+}
+
+cutoff <- quantile(actor_movies$popularity, 0.90, na.rm = TRUE)
+
+# Identify movie IDs that meet the popularity requirement
+allowed_movies <- actor_movies$id[actor_movies$popularity >= cutoff]
+
+# Create a new graph that only includes popular movies
+popular_graph <- make_restricted_graph(actor_graph, allowed_movies)
 
 ```
 
 ```{r - Bryce}
+### Testing Our Function
 
+#This is testing the function
+connect_to_mark("Jason Momoa")
+connect_to_mark("Kevin Hart")
+connect_to_mark("Jennifer Aniston")
+connect_to_mark("Kevin Bacon")
 
+# Full network connections
+connect_to_mark_2("Jason Momoa", actor_graph, actor_movies)
+connect_to_mark_2("Kevin Hart", actor_graph, actor_movies)
+connect_to_mark_2("Jennifer Aniston", actor_graph, actor_movies)
 
+# Popular-movies-only connections
+connect_to_mark_2("Jason Momoa", popular_graph, actor_movies)
+connect_to_mark_2("Kevin Hart", popular_graph, actor_movies)
+connect_to_mark_2("Jennifer Aniston", popular_graph, actor_movies)
 ```
 We had to work on putting together the connection_to_mark function. Overall, there were a couple different things we had to work around. One specific thing we had to work around was replacing the movie id with movie titles. This was fixed by putting nodes <- names(p) in the code chunk with the function so it output the movies in the path it took. Also, creating the path and the sum of the path was difficult. We worked around the addition of the paths part by asking ChatGPT how to add the paths up to output the Bacon/Wahlberg number.
