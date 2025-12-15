@@ -387,11 +387,6 @@ graph_summary(popular_graph)
 ```
 
 ```{r}
-# Full network connections
-connect_to_mark_2("Jason Momoa", actor_graph, actor_movies)
-connect_to_mark_2("Kevin Hart", actor_graph, actor_movies)
-connect_to_mark_2("Jennifer Aniston", actor_graph, actor_movies)
-
 # Popular-movies-only connections
 connect_to_mark_2("Jason Momoa", popular_graph, actor_movies)
 connect_to_mark_2("Kevin Hart", popular_graph, actor_movies)
