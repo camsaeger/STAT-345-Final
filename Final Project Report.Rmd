@@ -181,7 +181,7 @@ popular_graph <- make_restricted_graph(actor_graph, allowed_movies)
 
 ```
 
-### This tests our functions
+# Wahlberg Function Results
 
 ```{r function, echo=FALSE, message=FALSE, warning=FALSE}
 ### Testing Our Function
@@ -191,12 +191,11 @@ connect_to_mark("Jason Momoa")
 connect_to_mark("Kevin Hart")
 connect_to_mark("Jennifer Aniston")
 connect_to_mark("Kevin Bacon")
+```
 
-# Full network connections
-connect_to_mark_2("Jason Momoa", actor_graph, actor_movies)
-connect_to_mark_2("Kevin Hart", actor_graph, actor_movies)
-connect_to_mark_2("Jennifer Aniston", actor_graph, actor_movies)
+# Wahlberg Modified Function Results
 
+```{r function 2, echo=FALSE, message=FALSE, warning=FALSE}
 # Popular-movies-only connections
 connect_to_mark_2("Jason Momoa", popular_graph, actor_movies)
 connect_to_mark_2("Kevin Hart", popular_graph, actor_movies)
