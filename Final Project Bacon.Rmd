@@ -8,7 +8,7 @@ date: "2025-12-16"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Section One
+
 
 ```{r student1 - Cam, warning=FALSE}
 library(igraph)
@@ -26,23 +26,23 @@ library(dplyr)
 
 api_key <- "17dccb4de2aa1a7bf742763a8dc633be" # This is our API key that allows us to use the package that we installed to gather data from. 
 
-#This grabs all the action movies since 2000
+# This grabs all the action movies since 2000
 movies <- discover_movie(
   api_key     = api_key,
   with_genres = 28,             
   primary_release_year = "2000"
 )
 
-#This stores the result
+# This stores the result
 movies_list <- movies$results
 
-#This creates a character vector.
+# This creates a character vector.
 years <- as.character(2000:2024)
 
-#This is a function to download all action movies from a given year
+# This is a function to download all action movies from a given year
 get_year_movies <- function(year_str) {
 
-  #This gets the first page of results for this year.
+  # This gets the first page of results for this year.
   first <- discover_movie(
     api_key = api_key,
     with_genres = 28,
@@ -50,10 +50,10 @@ get_year_movies <- function(year_str) {
     page = 1
   )
 
-  #This is how many pages we are requesting.
+  # This is how many pages we are requesting.
   total_pages <- min(first$total_pages, 500)
 
-  #This is looking through all the pages and making them into a data frame.
+  # This is looking through all the pages and making them into a data frame.
   map_df(1:total_pages, ~ {
     Sys.sleep(0.25) 
     discover_movie(
@@ -65,7 +65,7 @@ get_year_movies <- function(year_str) {
   })
 }
 
-#This combines all the action movies into one data frame.
+# This combines all the action movies into one data frame.
 movies_all <- map_df(years, get_year_movies)
 
 ```
@@ -96,21 +96,21 @@ library(purrr)
 library(tibble)
 library(tidyr)
 
-safe_credits <- function(x) movie_credits(api_key, x)   #This is just using the api key we got.
+safe_credits <- function(x) movie_credits(api_key, x)   # This is just using the api key we got.
 
-credits_list <- map(movies_df1$id, safe_credits)      #This is the list of the movie credits
+credits_list <- map(movies_df1$id, safe_credits)      # This is the list of the movie credits
 
-#This is making the edges of the actor and movie dataframe
+# This is making the edges of the actor and movie dataframe
 actor_movie_edges <- map2_df(
   movies_df1$id,
   credits_list,
   ~ {
     if (is.null(.y)) return(NULL)
-#This is making the cast list a tibble
+# This is making the cast list a tibble
     cast_df <- tibble::as_tibble(.y$cast)
 
     if (!"name" %in% names(cast_df)) return(NULL)
-#This makes the dataframe with the actor id, actor name, and movie id 
+# This makes the dataframe with the actor id, actor name, and movie id 
     cast_df %>%
       select(actor_id = id, actor_name = name) %>%
       mutate(movie_id = .x)
@@ -120,7 +120,7 @@ actor_movie_edges <- map2_df(
 
 ```
 
-## Section Two
+
 ```{r}
 
 ### Creating CSV Files (1)
@@ -176,17 +176,17 @@ actor_graph <- graph_from_data_frame(actor_movies[, c("actor_name", "id")], dire
 ### Creating Connection To Mark Function
 
 connect_to_mark <- function(actor) {
-  p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]               #This is finding the shortest path from an input actor and connecting it back to Mark Wahlberg
-  if (length(p) == 0) return("No connection found.")    #This is saying if there is no path to Mark Wahlberg then it will give an output saying "No connection found."
+  p <- shortest_paths(actor_graph, actor, "Mark Wahlberg")$vpath[[1]]               # This is finding the shortest path from an input actor and connecting it back to Mark Wahlberg
+  if (length(p) == 0) return("No connection found.")    # This is saying if there is no path to Mark Wahlberg then it will give an output saying "No connection found."
 
   nodes <- names(p)
-#This replaces the movie id with the movie names
+# This replaces the movie id with the movie names
   path <- sapply(nodes, function(x)
     if (x %in% actor_movies$id) actor_movies$title[actor_movies$id == x][1] else x
   )
-#This adds how many movies it took to connect back to Mark Wahlberg
+# This adds how many movies it took to connect back to Mark Wahlberg
   movie_count <- sum(path %in% actor_movies$title)
-#This prints the path including actors and how many movies it took
+# This prints the path including actors and how many movies it took
   list(
     path = unname(path),
     movies = movie_count
@@ -200,7 +200,7 @@ connect_to_mark <- function(actor) {
 
 ### Testing Our Function
 
-#This is testing the function
+# This is testing the function
 connect_to_mark("Jason Momoa")
 connect_to_mark("Kevin Hart")
 connect_to_mark("Jennifer Aniston")
@@ -208,33 +208,33 @@ connect_to_mark("Kevin Bacon")
 ```
 
 
-```{r - Cam, warning=FALSE}
+```{r, warning=FALSE}
 
 ### Descriptive Statistics
 
 library(ggplot2)
 
-#This is collecting the shortest paths to Mark Wahlberg
+# This is collecting the shortest paths to Mark Wahlberg
 wahlberg_distances <- distances(
   actor_graph,
   v = V(actor_graph),
   to = "Mark Wahlberg"
 )
 
-#This converts the previous distances into a data frame
+# This converts the previous distances into a data frame
 wahlberg_df <- data.frame(
   actor = rownames(wahlberg_distances),
   wahlberg_number = as.numeric(wahlberg_distances[,1])
 )
 
-#This removes the actors who are not connected to Mark Wahlberg.
+# This removes the actors who are not connected to Mark Wahlberg.
 wahlberg_df_connected <- wahlberg_df %>%
   filter(is.finite(wahlberg_number))
 
-#This generates the summary statistics.
+# This generates the summary statistics.
 summary(wahlberg_df_connected$wahlberg_number)
 
-#This shows the distribution in a bar graph.
+# This shows the distribution in a bar graph.
 ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
   geom_bar(fill = "blue") +
   labs(
@@ -247,7 +247,9 @@ ggplot(wahlberg_df_connected, aes(x = wahlberg_number)) +
 ```
 
 
-```{r - Bryce}
+```{r}
+
+### Subset Actor Connectedness Graph 
 
 actor_edges <- actor_movies %>%
   select(id, actor_name) %>%
@@ -287,21 +289,24 @@ plot(
 ```
 
 ```{r}
+
+### Creating Modified Function
+
 # Here we are modifying our previous function to take into account only the most popular movies.
 
 connect_to_mark_2 <- function(actor, graph, actor_movies) {
 
-  # Compute the shortest path between the actor and Mark Wahlberg
+  # This computes the shortest path between the actor and Mark Wahlberg
   p <- shortest_paths(
     graph,
     from = actor,
     to   = "Mark Wahlberg"
   )$vpath[[1]]
 
-  # Extract the node names along the path
+  # This extract the node names along the path
   nodes <- names(p)
 
-  # Replace movie IDs with movie titles for readability
+  # This replaces movie IDs with movie titles 
   path <- sapply(nodes, function(x) {
     if (x %in% actor_movies$id) {
       actor_movies$title[actor_movies$id == x][1]
@@ -310,10 +315,10 @@ connect_to_mark_2 <- function(actor, graph, actor_movies) {
     }
   })
 
-  # Count how many movie nodes appear in the path
+  # This counts how many movie nodes appear in the path
   movie_count <- sum(path %in% actor_movies$title)
 
-  # Return the readable path and movie count
+  # This returns the path and movie count
   list(
     path   = unname(path),
     movies = movie_count
@@ -322,39 +327,45 @@ connect_to_mark_2 <- function(actor, graph, actor_movies) {
 ```
 
 ```{r}
+### Creating Modified Graph
 
 # Here we are creating the connectedness graph of our modified function based on popularity.
 
 make_restricted_graph <- function(full_graph, allowed_movie_ids) {
 
-  # Keep all actor nodes and only the movie nodes that meet the restriction
+  # This keep all actor nodes and only the movie nodes that meet the restriction
   keep_names <- c(
     V(full_graph)$name[!(V(full_graph)$name %in% actor_movies$id)],
     allowed_movie_ids
   )
 
-  # Induce a subgraph containing only the kept nodes
+  # Here we induce a subgraph containing only the kept nodes
   induced_subgraph(
     full_graph,
     vids = V(full_graph)[name %in% keep_names]
   )
 }
-```
 
-```{r}
+
 # Here we keep only movies in the top 10% of popularity
 cutoff <- quantile(actor_movies$popularity, 0.90, na.rm = TRUE)
 
-# Identify movie IDs that meet the popularity requirement
+# Then we identify movie IDs that meet the popularity requirement
 allowed_movies <- actor_movies$id[actor_movies$popularity >= cutoff]
 
-# Create a new graph that only includes popular movies
+# Then we created a new graph that only includes popular movies
 popular_graph <- make_restricted_graph(actor_graph, allowed_movies)
+
+
 ```
 
 
+
 ```{r}
-# Testing our modified function with top popular movies
+
+### Testing Modified Function
+
+# Finally we test our modified function with top popular movies
 connect_to_mark_2("Jason Momoa", popular_graph, actor_movies)
 connect_to_mark_2("Kevin Hart", popular_graph, actor_movies)
 connect_to_mark_2("Jennifer Aniston", popular_graph, actor_movies)
